@@ -338,6 +338,8 @@ class Creator extends AbstractWorker
             $this->installPear();
             $this->installPhpConfigPhpize();
             $this->installComposer();
+            $this->copyPearCmdScript();
+            $this->copyPeclCmdScript();
             $this->copyActivateScript();
         } catch (\Exception $e) {
             $this->output->writeln('<error>ERROR: ' . $e->getMessage() . '</error>');
@@ -753,6 +755,42 @@ EOD;
             $this->getEnvBinDir() . DIRECTORY_SEPARATOR . 'activate',
             $activateScript,
             0644
+        );
+    }
+
+    /**
+     * Clones the peclcmd script from this library and modifies for the
+     * new virtual environment
+     */
+    protected function copyPearCmdScript()
+    {
+        $this->output->writeln('Installing pearcmd script');
+
+        $pearCmdScript = $this->getFilesystem()->getContents(__DIR__ . '/../../../res/pearcmd.php');
+
+        $pearCmdScript = str_replace('__VIRTPHP_ENV_PATH__', $this->getEnvPath(), $pearCmdScript);
+
+        $this->getFilesystem()->dumpFile(
+            $this->getEnvIncDir() . DIRECTORY_SEPARATOR . 'peclcmd.php',
+            $pearCmdScript
+        );
+    }
+
+    /**
+     * Clones the peclcmd script from this library and modifies for the
+     * new virtual environment
+     */
+    protected function copyPeclCmdScript()
+    {
+        $this->output->writeln('Installing peclcmd script');
+
+        $peclCmdScript = $this->getFilesystem()->getContents(__DIR__ . '/../../../res/peclcmd.php');
+
+        $peclCmdScript = str_replace('__VIRTPHP_ENV_PATH__', $this->getEnvPath(), $peclCmdScript);
+
+        $this->getFilesystem()->dumpFile(
+            $this->getEnvIncDir() . DIRECTORY_SEPARATOR . 'peclcmd.php',
+            $peclCmdScript
         );
     }
 
